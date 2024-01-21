@@ -12,7 +12,7 @@ const CardContainer = styled.div`
 export const CardList = styled.div`
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
+  justify-content: flex-start;
 `;
 
 export const Card = styled(CardContainer)`

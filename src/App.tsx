@@ -1,13 +1,14 @@
-import Counter from "counter";
 import "./styles.css";
 import { Key, useEffect, useState } from "react";
 import { TextField } from "@mui/material";
 import users from "./data";
 import { Card, CardList, RemoveButton, RestoreButton } from "App.style";
+import Counter from "./Counter";
 
 export default function App(props: any) {
-  const [filteredUsers, setFilteredUsers] = useState<any[]>([]);
-  const [removedUsers, setRemovedUsers] = useState<any[]>([]);
+  const [activeUsersData, setActiveUsersData] = useState<User[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+  const [removedUsers, setRemovedUsers] = useState<User[]>([]);
   const [searchInput, setSearchInput] = useState<string>('');
   const [text, setText] = useState("");
 
@@ -38,21 +39,19 @@ export default function App(props: any) {
       }
       return a.companyName.localeCompare(b.companyName);
     });
-
-    console.log(mappedUsersOnLoad);
-    setFilteredUsers(mappedUsersOnLoad);
+    setActiveUsersData(mappedUsersOnLoad);
   }, []);
 
-  const handleRemoveUser = (userId: number) => {
-    const removedUser = filteredUsers.find(user => user.id === userId);
+  const handleRemoveUser = (userId: string) => {
+    const removedUser = activeUsersData.find(user => user.id === userId);
     setRemovedUsers(prevRemovedUsers => [...prevRemovedUsers, removedUser]);
-    const updatedUsersData = filteredUsers.filter((user: { id: number; }) => user.id !== userId);
-    setFilteredUsers(updatedUsersData);
+    const updatedUsersData = activeUsersData.filter((user: { id: string; }) => user.id !== userId);
+    setActiveUsersData(updatedUsersData);
   };
 
-  const handleRestoreUser = (userId: number) => {
+  const handleRestoreUser = (userId: string) => {
     const restoredUser = removedUsers.find(user => user.id === userId);
-    setFilteredUsers(prevUsersData => [...prevUsersData, restoredUser]);
+    setActiveUsersData(prevUsersData => [...prevUsersData, restoredUser]);
     setRemovedUsers(prevRemovedUsers =>
       prevRemovedUsers.filter(user => user.id !== userId)
     );
@@ -61,9 +60,13 @@ export default function App(props: any) {
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const searchText = event.target.value.toLowerCase();
     setSearchInput(searchText);
-    const allUsers = [...filteredUsers, ...removedUsers];
+    if (searchText === '') {
+      setFilteredUsers(activeUsersData);
+      return;
+    }
+    const allUsers = [...activeUsersData, ...removedUsers];
     const updatedUser = allUsers.filter(user =>
-      user.username.toLowerCase().includes(searchInput)
+      user.username.toLowerCase().includes(searchText)
     );
     setFilteredUsers(updatedUser);
   };
@@ -78,25 +81,47 @@ export default function App(props: any) {
         onChange={handleSearchChange}
       />
       <CardList>
-        {filteredUsers.map((user: any, index: Key) => (
-          <Card key={index}>
-            <h2>ID: {user.id}</h2>
-            <p>Username: {user.username}</p>
-            <p>Age: {user.age}</p>
-            <p>Address: {JSON.stringify(user.address)}</p>
-            <p>Company Name: {user.companyName}</p>
-            {removedUsers.includes(user) && (
-              <RestoreButton onClick={() => handleRestoreUser(user.id)}>
-                Restore
-              </RestoreButton>
-            )}
-            {!removedUsers.includes(user) && (
-              <RemoveButton onClick={() => handleRemoveUser(user.id)}>
-                Remove
-              </RemoveButton>
-            )}
-          </Card>
-        ))}
+        {filteredUsers.length ?
+          filteredUsers.map((user: any, index: Key) => (
+            <Card key={index}>
+              <h2>ID: {user.id}</h2>
+              <p>Username: {user.username}</p>
+              <p>Age: {user.age}</p>
+              <p>Address: {JSON.stringify(user.address)}</p>
+              <p>Company Name: {user.companyName}</p>
+              {removedUsers.includes(user) && (
+                <RestoreButton onClick={() => handleRestoreUser(user.id)}>
+                  Restore
+                </RestoreButton>
+              )}
+              {!removedUsers.includes(user) && (
+                <RemoveButton onClick={() => handleRemoveUser(user.id)}>
+                  Remove
+                </RemoveButton>
+              )}
+            </Card>
+          ))
+          :
+          activeUsersData.map((user: any, index: Key) => (
+            <Card key={index}>
+              <h2>ID: {user.id}</h2>
+              <p>Username: {user.username}</p>
+              <p>Age: {user.age}</p>
+              <p>Address: {JSON.stringify(user.address)}</p>
+              <p>Company Name: {user.companyName}</p>
+              {removedUsers.includes(user) && (
+                <RestoreButton onClick={() => handleRestoreUser(user.id)}>
+                  Restore
+                </RestoreButton>
+              )}
+              {!removedUsers.includes(user) && (
+                <RemoveButton onClick={() => handleRemoveUser(user.id)}>
+                  Remove
+                </RemoveButton>
+              )}
+            </Card>
+          ))
+        }
       </CardList>
     </>
   );

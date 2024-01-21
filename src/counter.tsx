@@ -12,18 +12,51 @@ export default function Counter() {
             defaultValue={numberInput}
             type="number"
             style={{ display: "block" }}
+            onChange={(event) => setNumberInput(Number(event.target.value))}
         />
         <Button
+            style={{ margin: 8 }}
             variant="contained"
             onClick={() => dispatch({ type: "decrement" })}
         >
             -
         </Button>
         <Button
+            style={{ margin: 8 }}
             variant="contained"
             onClick={() => dispatch({ type: "increment" })}
         >
             +
         </Button>
+        <Button
+            style={{ margin: 8 }}
+            variant="contained"
+            onClick={() => dispatch({ type: 'incrementBy', payload: 2 })}
+
+        >
+            Increment by 2
+        </Button >
+        <Button
+            style={{ margin: 8 }}
+            variant="contained"
+            onClick={() => dispatch({ type: 'incrementToNearestOdd' })}
+
+        >
+            Increment to neareast Odd
+        </Button >
+        <Button
+            style={{ margin: 8 }}
+            variant="contained"
+            onClick={() => dispatch({ type: 'decrementByInput', payload: numberInput })}
+        >
+            Decrement By Input
+        </Button >
+        <Button
+            style={{ margin: 8 }}
+            variant="contained"
+            onClick={() => dispatch({ type: 'reset' })}
+        >
+            RESET
+        </Button >
     </>)
 }
