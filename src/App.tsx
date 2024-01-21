@@ -51,7 +51,12 @@ export default function App(props: any) {
 
   const handleRestoreUser = (userId: string) => {
     const restoredUser = removedUsers.find(user => user.id === userId);
-    setActiveUsersData(prevUsersData => [...prevUsersData, restoredUser]);
+    setActiveUsersData(prevUsersData => [...prevUsersData, restoredUser].sort((a, b) => {
+      if (a.age !== b.age) {
+        return a.age - b.age;
+      }
+      return a.companyName.localeCompare(b.companyName);
+    }));
     setRemovedUsers(prevRemovedUsers =>
       prevRemovedUsers.filter(user => user.id !== userId)
     );
@@ -61,7 +66,7 @@ export default function App(props: any) {
     const searchText = event.target.value.toLowerCase();
     setSearchInput(searchText);
     if (searchText === '') {
-      setFilteredUsers(activeUsersData);
+      setFilteredUsers([]);
       return;
     }
     const allUsers = [...activeUsersData, ...removedUsers];
